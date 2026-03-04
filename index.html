@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clarity - Controle Financeiro</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <h1>Clarity</h1>
+  </header>
+
+  <main>
+    <section id="dashboard">
+      <h2>Dashboard</h2>
+      <div class="card">
+        <p>Saldo Atual</p>
+        <h3 id="saldo">R$ 0,00</h3>
+      </div>
+      <div class="card">
+        <p>Status da Meta</p>
+        <h3 id="statusMeta">—</h3>
+      </div>
+    </section>
+
+    <section>
+      <h2>Adicionar Receita</h2>
+      <input type="number" id="receitaValor" placeholder="Valor">
+      <button onclick="adicionarReceita()">Salvar</button>
+    </section>
+
+    <section>
+      <h2>Adicionar Despesa</h2>
+      <input type="number" id="despesaValor" placeholder="Valor">
+      <button onclick="adicionarDespesa()">Salvar</button>
+    </section>
+  </main>
+
+  <script src="storage.js"></script>
+  <script src="analytics.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
