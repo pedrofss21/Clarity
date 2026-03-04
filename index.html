@@ -3,67 +3,55 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clarity</title>
+<title>Clarity Pro</title>
 <link rel="stylesheet" href="style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
 
-<div class="app">
+<div class="container">
 
-  <section id="dashboard" class="page active">
-    <h2>Dashboard</h2>
+<header class="header">
+  <div>
+    <h1>Olá, Pedro 👋</h1>
+    <p>Seu resumo financeiro</p>
+  </div>
+</header>
 
-    <div class="card">
-      <p>Saldo Total</p>
-      <h1 id="saldoTotal">R$ 0,00</h1>
-    </div>
+<section class="saldo-card">
+  <p>Saldo Total</p>
+  <h2 id="saldoTotal">R$ 0,00</h2>
+  <span>Disponível</span>
+</section>
 
-    <div class="grid">
-      <div class="mini-card">
-        <p>Receitas</p>
-        <span id="totalReceitas"></span>
-      </div>
+<section class="resumo-cards">
+  <div class="mini receita">
+    <p>Receitas</p>
+    <h3 id="totalReceitas">R$ 0,00</h3>
+  </div>
 
-      <div class="mini-card">
-        <p>Despesas</p>
-        <span id="totalDespesas"></span>
-      </div>
-    </div>
+  <div class="mini despesa">
+    <p>Despesas</p>
+    <h3 id="totalDespesas">R$ 0,00</h3>
+  </div>
+</section>
 
-    <canvas id="grafico"></canvas>
+<section class="grafico">
+  <h3>Despesas do Mês</h3>
+  <canvas id="graficoPizza"></canvas>
+</section>
 
-    <div class="card">
-      <p>Saúde Financeira</p>
-      <h2 id="indiceSaude"></h2>
-    </div>
+<section class="transacoes">
+  <h3>Últimas Transações</h3>
+  <ul id="listaTransacoes"></ul>
+</section>
 
-  </section>
-
-  <section id="transacoes" class="page">
-    <h2>Transações</h2>
-    <button onclick="novaTransacao()">Nova Transação</button>
-    <ul id="listaTransacoes"></ul>
-  </section>
-
-  <section id="metas" class="page">
-    <h2>Metas</h2>
-    <button onclick="definirMeta()">Definir Meta</button>
-    <div id="infoMeta"></div>
-  </section>
-
-  <section id="config" class="page">
-    <h2>Configurações</h2>
-    <button onclick="exportarBackup()">Exportar Backup</button>
-    <button onclick="resetar()">Resetar Dados</button>
-  </section>
-
-  <nav class="navbar">
-    <button onclick="trocarPagina('dashboard')">🏠</button>
-    <button onclick="trocarPagina('transacoes')">💸</button>
-    <button onclick="trocarPagina('metas')">🎯</button>
-    <button onclick="trocarPagina('config')">⚙️</button>
-  </nav>
+<nav class="navbar">
+  <button>🏠</button>
+  <button>💳</button>
+  <button>🎯</button>
+  <button>👤</button>
+</nav>
 
 </div>
 
