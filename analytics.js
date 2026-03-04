@@ -20,3 +20,19 @@ function analisarMeta(data) {
   if (precisaPorMes <= saldo) return "🟠 Difícil";
   return "🔴 Irreal";
 }
+
+function calcularSaude(data){
+  const receitas = totalReceitas(data);
+  const despesas = totalDespesas(data);
+
+  if(receitas === 0) return 0;
+
+  const taxaPoupanca = (receitas - despesas) / receitas;
+
+  let score = taxaPoupanca * 100;
+
+  if(score > 100) score = 100;
+  if(score < 0) score = 0;
+
+  return Math.round(score);
+}
