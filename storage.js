@@ -1,14 +1,7 @@
-const STORAGE_KEY = "clarity_data";
+let transacoes = JSON.parse(localStorage.getItem("transacoes")) || []
 
-function carregarDados() {
-  const data = localStorage.getItem(STORAGE_KEY);
-  return data ? JSON.parse(data) : {
-    receitas: [],
-    despesas: [],
-    meta: null
-  };
-}
+function salvarBanco(){
 
-function salvarDados(data) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+localStorage.setItem("transacoes", JSON.stringify(transacoes))
+
 }
