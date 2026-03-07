@@ -1,34 +1,80 @@
-let data = carregarDados();
+function abrirModal(){
 
-function atualizarDashboard() {
-  const saldo = calcularSaldo(data);
-  document.getElementById("saldo").innerText =
-    "R$ " + saldo.toFixed(2);
+document.getElementById("modal").style.display="flex"
 
-  document.getElementById("statusMeta").innerText =
-    analisarMeta(data);
 }
 
-function adicionarReceita() {
-  const valor = parseFloat(
-    document.getElementById("receitaValor").value
-  );
-  if (!valor) return;
+function salvarTransacao(){
 
-  data.receitas.push(valor);
-  salvarDados(data);
-  atualizarDashboard();
+let nome = document.getElementById("nome").value
+let valor = Number(document.getElementById("valor").value)
+let tipo = document.getElementById("tipo").value
+
+let transacao = {
+
+id: Date.now(),
+nome,
+valor,
+tipo
+
 }
 
-function adicionarDespesa() {
-  const valor = parseFloat(
-    document.getElementById("despesaValor").value
-  );
-  if (!valor) return;
+transacoes.push(transacao)
 
-  data.despesas.push(valor);
-  salvarDados(data);
-  atualizarDashboard();
+salvarBanco()
+
+atualizarTela()
+
+document.getElementById("modal").style.display="none"
+
 }
 
-atualizarDashboard();
+function atualizarTela(){
+
+let lista = document.getElementById("listaTransacoes")
+
+lista.innerHTML=""
+
+let receitas = 0
+let despesas = 0
+
+transacoes.forEach(t=>{
+
+let div = document.createElement("div")
+
+div.className="item"
+
+div.innerHTML=`
+<span>${t.nome}</span>
+<span class="${t.tipo}">
+R$ ${t.valor}
+</span>
+`
+
+lista.appendChild(div)
+
+if(t.tipo=="receita"){
+
+receitas += t.valor
+
+}else{
+
+despesas += t.valor
+
+}
+
+})
+
+let saldo = receitas - despesas
+
+document.getElementById("saldo").innerText = saldo.toFixed(2)
+
+document.getElementById("receitas").innerText = receitas.toFixed(2)
+
+document.getElementById("despesas").innerText = despesas.toFixed(2)
+
+atualizarGraficos(receitas,despesas)
+
+}
+
+atualizarTela()
