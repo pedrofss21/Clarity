@@ -1,192 +1,118 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
+
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Clarity One</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<title>Controle Financeiro</title>
+
+<link rel="stylesheet" href="style.css">
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<style>
-body{
-margin:0;
-font-family:-apple-system,BlinkMacSystemFont,sans-serif;
-background:#0f1117;
-color:white;
-}
-
-.container{
-padding:20px;
-padding-bottom:100px;
-}
-
-header h1{
-margin:0;
-font-size:22px;
-}
-
-header p{
-color:#8a8f98;
-margin-bottom:25px;
-}
-
-.saldo{
-background:linear-gradient(135deg,#3a7bd5,#6a11cb);
-padding:25px;
-border-radius:20px;
-margin-bottom:20px;
-}
-
-.saldo h2{
-margin:5px 0 0;
-font-size:28px;
-}
-
-.grid{
-display:flex;
-gap:15px;
-margin-bottom:20px;
-}
-
-.card{
-flex:1;
-background:#1a1d26;
-padding:20px;
-border-radius:15px;
-}
-
-.receita h3{color:#2ecc71;}
-.despesa h3{color:#e74c3c;}
-
-.section{
-background:#1a1d26;
-padding:15px;
-border-radius:15px;
-margin-bottom:20px;
-}
-
-ul{
-list-style:none;
-padding:0;
-margin:0;
-}
-
-li{
-display:flex;
-justify-content:space-between;
-padding:12px 0;
-border-bottom:1px solid #2a2f3a;
-}
-
-.fab{
-position:fixed;
-bottom:20px;
-right:20px;
-width:60px;
-height:60px;
-border-radius:50%;
-border:none;
-font-size:26px;
-color:white;
-background:linear-gradient(135deg,#3a7bd5,#6a11cb);
-}
-</style>
 </head>
 
 <body>
 
-<div class="container">
+<div class="app">
 
 <header>
-<h1>Olá, Pedro 👋</h1>
-<p>Seu resumo financeiro</p>
+
+<h2>Resumo Financeiro</h2>
+
 </header>
 
-<div class="saldo">
-<p>Saldo Total</p>
-<h2 id="saldoTotal">R$ 0,00</h2>
+<div class="saldo-card">
+
+<h3>Saldo Total</h3>
+
+<h1 id="saldo">R$ 0,00</h1>
+
 </div>
 
-<div class="grid">
+<div class="resumo">
+
 <div class="card receita">
-<p>Receitas</p>
-<h3 id="totalReceitas">R$ 0,00</h3>
+
+Receitas  
+<h3 id="receitas">R$0</h3>
+
 </div>
 
 <div class="card despesa">
-<p>Despesas</p>
-<h3 id="totalDespesas">R$ 0,00</h3>
-</div>
-</div>
 
-<div class="section">
-<h3>Despesas do Mês</h3>
-<canvas id="grafico"></canvas>
-</div>
-
-<div class="section">
-<h3>Últimas Transações</h3>
-<ul id="lista"></ul>
-</div>
-
-<button class="fab" onclick="novaTransacao()">+</button>
+Despesas  
+<h3 id="despesas">R$0</h3>
 
 </div>
 
-<script>
-let data={
-receitas:[],
-despesas:[]
-};
+</div>
 
-function atualizar(){
-let receitas=data.receitas.reduce((a,b)=>a+b,0);
-let despesas=data.despesas.reduce((a,b)=>a+b,0);
-let saldo=receitas-despesas;
+<button onclick="abrirModal()" class="btn">
 
-document.getElementById("saldoTotal").innerText="R$ "+saldo.toFixed(2);
-document.getElementById("totalReceitas").innerText="R$ "+receitas.toFixed(2);
-document.getElementById("totalDespesas").innerText="R$ "+despesas.toFixed(2);
++ Adicionar Transação
 
-let lista=document.getElementById("lista");
-lista.innerHTML="";
+</button>
 
-[...data.receitas.map(v=>({tipo:"Receita",valor:v})),
- ...data.despesas.map(v=>({tipo:"Despesa",valor:v}))]
+<div class="card">
 
-.slice(-5)
-.reverse()
-.forEach(t=>{
-let li=document.createElement("li");
-li.innerHTML=`<span>${t.tipo}</span><span>R$ ${t.valor.toFixed(2)}</span>`;
-lista.appendChild(li);
-});
-}
+<h3>Despesas do mês</h3>
 
-function novaTransacao(){
-let tipo=prompt("Digite: receita ou despesa");
-let valor=parseFloat(prompt("Valor:"));
+<canvas id="pieChart"></canvas>
 
-if(!valor||valor<=0)return;
+</div>
 
-if(tipo==="receita")data.receitas.push(valor);
-if(tipo==="despesa")data.despesas.push(valor);
+<div class="card">
 
-atualizar();
-}
+<h3>Gastos semanais</h3>
 
-atualizar();
+<canvas id="barChart"></canvas>
 
-new Chart(document.getElementById("grafico"),{
-type:"doughnut",
-data:{
-labels:["Despesas"],
-datasets:[{
-data:[1],
-backgroundColor:["#e74c3c"]
-}]
-}
-});
-</script>
+</div>
+
+<div class="card">
+
+<h3>Transações</h3>
+
+<div id="listaTransacoes"></div>
+
+</div>
+
+</div>
+
+<div id="modal" class="modal">
+
+<div class="modal-content">
+
+<h3>Nova Transação</h3>
+
+<input id="nome" placeholder="Descrição">
+
+<input id="valor" type="number" placeholder="Valor">
+
+<select id="tipo">
+
+<option value="receita">Receita</option>
+<option value="despesa">Despesa</option>
+
+</select>
+
+<button onclick="salvarTransacao()">
+
+Salvar
+
+</button>
+
+</div>
+
+</div>
+
+<script src="database.js"></script>
+<script src="charts.js"></script>
+<script src="app.js"></script>
 
 </body>
+
 </html>
