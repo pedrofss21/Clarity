@@ -1,6 +1,6 @@
 body {
   margin: 0;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Segoe UI', sans-serif;
   background: #090911;
   color: #eee;
 }
@@ -12,7 +12,7 @@ body {
 }
 
 .title {
-  font-size: 30px;
+  font-size: 28px;
   font-weight: 800;
   background: linear-gradient(130deg,#fff,#4f8ef7);
   -webkit-background-clip: text;
@@ -21,7 +21,7 @@ body {
 
 .card {
   background: rgba(255,255,255,0.05);
-  border-radius: 20px;
+  border-radius: 18px;
   padding: 16px;
   margin-top: 12px;
   backdrop-filter: blur(20px);
@@ -40,7 +40,6 @@ button {
   border: none;
   background: #1a1a2a;
   color: #aaa;
-  font-weight: 600;
   cursor: pointer;
 }
 
@@ -53,7 +52,6 @@ button.active {
   width: 100%;
   margin-top: 10px;
   background: linear-gradient(135deg,#4f8ef7,#8b5cf6);
-  color: white;
 }
 
 input {
