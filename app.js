@@ -14,6 +14,7 @@ const state = {
   recs: JSON.parse(localStorage.getItem("hig_v4")) || [],
   yr: new Date().getFullYear(),
   mo: new Date().getMonth(),
+  theme: localStorage.getItem("theme") || "dark"
 };
 
 const fmt = v => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -21,6 +22,17 @@ const mkKey = (y,m) => `${y}-${String(m+1).padStart(2,"0")}`;
 
 function setState(obj) {
   Object.assign(state, obj);
+  render();
+}
+
+function applyTheme() {
+  document.body.classList.toggle("light", state.theme === "light");
+}
+
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", state.theme);
+  applyTheme();
   render();
 }
 
@@ -147,6 +159,10 @@ function render() {
   document.getElementById("app").innerHTML = `
     <div class="container">
 
+      <button onclick="toggleTheme()">
+        ${state.theme === "dark" ? "☀️ Claro" : "🌙 Escuro"}
+      </button>
+
       <div class="title">Higienizações</div>
 
       <div class="card">
@@ -170,7 +186,6 @@ function render() {
         </div>
 
         <input type="date" id="dateInput">
-
         <input id="plateInput" placeholder="Placa ou Chassi">
 
         <button class="primary" onclick="addRec()">+ Adicionar</button>
@@ -206,4 +221,5 @@ function render() {
   `;
 }
 
+applyTheme();
 render();
