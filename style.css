@@ -2,132 +2,122 @@
   box-sizing: border-box;
 }
 
+/* THEMES */
 :root {
-  --bg: #0b0b0f;
-  --text: #f5f5f7;
-  --sub: #a1a1aa;
-
-  --glass: rgba(255,255,255,0.06);
-  --glass-strong: rgba(255,255,255,0.12);
-
-  --border: rgba(255,255,255,0.08);
-
-  --blue: #4f8ef7;
-  --purple: #8b5cf6;
-  --green: #10b981;
-}
-
-.light {
   --bg: #f5f7fb;
   --text: #0f172a;
   --sub: #6b7280;
-
-  --glass: rgba(255,255,255,0.7);
-  --glass-strong: rgba(255,255,255,0.9);
-
-  --border: rgba(0,0,0,0.06);
+  --glass: rgba(255,255,255,0.55);
+  --border: rgba(255,255,255,0.5);
 }
 
+.dark {
+  --bg: #020617;
+  --text: #f1f5f9;
+  --sub: #94a3b8;
+  --glass: rgba(255,255,255,0.05);
+  --border: rgba(255,255,255,0.08);
+}
+
+/* BODY */
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
-  background: var(--bg);
+  background: radial-gradient(circle at 20% 20%, #dfe9f3, #f5f7fb 40%);
   color: var(--text);
-  transition: all .35s ease;
+  transition: .3s;
+  overflow-x: hidden;
 }
 
-/* Container */
+.dark body {
+  background: radial-gradient(circle at 20% 20%, #0f172a, #020617 60%);
+}
+
+/* LIGHT EFFECT */
+.bg-light {
+  position: fixed;
+  width: 300px;
+  height: 300px;
+  top: -100px;
+  right: -100px;
+  background: radial-gradient(circle, rgba(122,167,255,.3), transparent 70%);
+  filter: blur(80px);
+}
+
+/* CONTAINER */
 .container {
   max-width: 430px;
   margin: auto;
   padding: 20px;
 }
 
-/* Title */
+/* TITLE */
 .title {
   font-size: 32px;
   font-weight: 800;
-  margin-bottom: 10px;
-
-  background: linear-gradient(120deg,#fff, var(--blue));
+  background: linear-gradient(120deg,#111,#4f8ef7);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Glass card */
+/* CARD */
 .card {
   background: var(--glass);
   backdrop-filter: blur(30px);
-  -webkit-backdrop-filter: blur(30px);
-
+  border-radius: 26px;
   border: 1px solid var(--border);
-  border-radius: 24px;
-
   padding: 18px;
   margin-top: 14px;
 
   box-shadow:
-    0 10px 30px rgba(0,0,0,0.25),
-    inset 0 1px 0 rgba(255,255,255,0.05);
+    0 10px 30px rgba(0,0,0,0.08),
+    inset 0 1px 0 rgba(255,255,255,0.6);
 }
 
-/* Buttons */
+/* ROW */
+.row {
+  display: flex;
+  gap: 10px;
+}
+
+/* BUTTON */
 button {
-  border: none;
-  border-radius: 16px;
+  border-radius: 18px;
   padding: 14px;
-  font-weight: 600;
+  border: 1px solid var(--border);
+  background: var(--glass);
   cursor: pointer;
-
-  background: rgba(255,255,255,0.05);
-  color: var(--sub);
-
-  transition: all .2s ease;
+  transition: .2s;
+  color: var(--text);
 }
 
 button.active {
-  background: linear-gradient(135deg,var(--blue),var(--purple));
-  color: #fff;
-
-  box-shadow: 0 6px 20px rgba(79,142,247,.4);
+  background: linear-gradient(135deg,#7aa7ff,#a78bfa);
+  color: white;
+  box-shadow: 0 6px 20px rgba(122,167,255,.4);
 }
 
-button:active {
-  transform: scale(.96);
-}
-
-/* Primary button */
+/* PRIMARY */
 .primary {
   width: 100%;
-  margin-top: 14px;
-
-  background: linear-gradient(135deg,var(--blue),var(--purple));
+  margin-top: 12px;
+  background: linear-gradient(135deg,#7aa7ff,#a78bfa);
   color: white;
-
-  box-shadow: 0 10px 30px rgba(79,142,247,.4);
+  box-shadow: 0 12px 30px rgba(122,167,255,.4);
 }
 
-/* Inputs */
+/* INPUT */
 input {
   width: 100%;
-  margin-top: 12px;
+  margin-top: 10px;
   padding: 14px;
-
   border-radius: 16px;
   border: 1px solid var(--border);
-
-  background: var(--glass-strong);
+  background: var(--glass);
   color: var(--text);
-
-  font-size: 15px;
-  outline: none;
 }
 
-input::placeholder {
-  color: var(--sub);
-}
-
-/* Stats */
+/* STATS */
 .stats {
   display: flex;
   justify-content: space-between;
@@ -135,49 +125,35 @@ input::placeholder {
 }
 
 .stats div {
-  background: var(--glass);
+  width: 48%;
   padding: 14px;
   border-radius: 16px;
-  width: 48%;
-
-  text-align: center;
-
+  background: var(--glass);
   border: 1px solid var(--border);
+  text-align: center;
 }
 
-/* List items */
+/* ITEM */
 .item {
   display: flex;
   justify-content: space-between;
   align-items: center;
-
   margin-top: 10px;
   padding: 14px;
-
   border-radius: 18px;
   background: var(--glass);
   border: 1px solid var(--border);
-
-  backdrop-filter: blur(20px);
 }
 
-.item strong {
-  font-size: 16px;
-}
-
-.item small {
-  color: var(--sub);
-}
-
-/* Floating theme button */
-.theme-btn {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-
-  background: var(--glass);
-  backdrop-filter: blur(20px);
-
-  border-radius: 50px;
-  padding: 8px 14px;
+/* TOAST */
+#toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #10b981;
+  padding: 12px 20px;
+  border-radius: 30px;
+  display: none;
+  color: white;
 }
