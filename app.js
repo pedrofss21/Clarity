@@ -11,7 +11,6 @@ const MONTHS = [
 const state = {
   svc: null,
   vtp: null,
-  plate: "",
   recs: JSON.parse(localStorage.getItem("hig_v4")) || [],
   yr: new Date().getFullYear(),
   mo: new Date().getMonth(),
@@ -32,45 +31,113 @@ function toast(msg) {
   setTimeout(() => t.style.display = "none", 2000);
 }
 
+// ADD
 function addRec() {
+  const plateInput = document.getElementById("plateInput");
+  const dateInput = document.getElementById("dateInput");
+
+  const plate = plateInput.value;
+
   if (!state.svc) return toast("Selecione o serviço");
   if (!state.vtp) return toast("Selecione o tipo");
-  if (!state.plate) return toast("Digite a placa");
+  if (!plate) return toast("Digite a placa");
+
+  let dateValue = dateInput.value;
+  if (!dateValue) {
+    dateValue = new Date().toLocaleDateString("pt-BR");
+  } else {
+    dateValue = new Date(dateValue).toLocaleDateString("pt-BR");
+  }
 
   state.recs.unshift({
     id: Date.now(),
-    plate: state.plate.toUpperCase(),
+    plate: plate.toUpperCase(),
     svc: state.svc,
     vtp: state.vtp,
     commission: COMMISSION[state.svc][state.vtp],
-    date: new Date().toLocaleDateString("pt-BR"),
+    date: dateValue,
     mk: mkKey(state.yr, state.mo),
   });
 
   localStorage.setItem("hig_v4", JSON.stringify(state.recs));
 
-  setState({ plate:"", svc:null, vtp:null });
+  plateInput.value = "";
+  dateInput.value = "";
+
+  setState({ svc:null, vtp:null });
   toast("Veículo adicionado!");
 }
 
+// DELETE
 function delRec(id) {
   state.recs = state.recs.filter(r => r.id != id);
   localStorage.setItem("hig_v4", JSON.stringify(state.recs));
   render();
 }
 
-function prevMo() {
-  state.mo--;
-  if (state.mo < 0) { state.mo = 11; state.yr--; }
+// EDIT
+function editRec(id) {
+  const r = state.recs.find(x => x.id == id);
+
+  const plate = prompt("Placa:", r.plate);
+  if (!plate) return;
+
+  const svc = prompt("Serviço (Higienização/Polimento):", r.svc);
+  if (!svc) return;
+
+  const vtp = prompt("Tipo (Novo/Semi-novo):", r.vtp);
+  if (!vtp) return;
+
+  r.plate = plate.toUpperCase();
+  r.svc = svc;
+  r.vtp = vtp;
+  r.commission = COMMISSION[svc][vtp];
+
+  localStorage.setItem("hig_v4", JSON.stringify(state.recs));
   render();
+  toast("Editado!");
 }
 
-function nextMo() {
-  state.mo++;
-  if (state.mo > 11) { state.mo = 0; state.yr++; }
-  render();
+// PDF
+function exportPDF() {
+  const mk = mkKey(state.yr, state.mo);
+  const mRecs = state.recs.filter(r => r.mk === mk);
+
+  if (!mRecs.length) return toast("Sem registros");
+
+  const total = mRecs.reduce((s,r)=>s+r.commission,0);
+
+  const rows = mRecs.map(r => `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.svc}</td>
+      <td>${r.vtp}</td>
+      <td>${r.plate}</td>
+      <td>${fmt(r.commission)}</td>
+    </tr>
+  `).join("");
+
+  const html = `
+    <html>
+    <body>
+      <h2>${MONTHS[state.mo]} ${state.yr}</h2>
+      <table border="1" style="width:100%;border-collapse:collapse">
+        <tr>
+          <th>Data</th><th>Serviço</th><th>Tipo</th><th>Placa</th><th>Valor</th>
+        </tr>
+        ${rows}
+      </table>
+      <h3>Total: ${fmt(total)}</h3>
+    </body>
+    </html>
+  `;
+
+  const win = window.open("", "_blank");
+  win.document.write(html);
+  win.print();
 }
 
+// RENDER
 function render() {
   const mk = mkKey(state.yr, state.mo);
   const mRecs = state.recs.filter(r => r.mk === mk);
@@ -102,20 +169,16 @@ function render() {
           Comissão: ${comm ? fmt(comm) : "R$ —"}
         </div>
 
-        <input 
-          value="${state.plate}"
-          oninput="setState({plate:this.value})"
-          placeholder="Placa ou Chassi"
-        />
+        <input type="date" id="dateInput">
+
+        <input id="plateInput" placeholder="Placa ou Chassi">
 
         <button class="primary" onclick="addRec()">+ Adicionar</button>
 
       </div>
 
       <div class="card">
-        <button onclick="prevMo()">‹</button>
         ${MONTHS[state.mo]} ${state.yr}
-        <button onclick="nextMo()">›</button>
       </div>
 
       <div class="stats">
@@ -123,14 +186,17 @@ function render() {
         <div>💰 ${fmt(total)}</div>
       </div>
 
+      <button class="primary" onclick="exportPDF()">📄 Gerar Relatório</button>
+
       ${mRecs.map(r=>`
         <div class="item">
           <div>
             <strong>${r.plate}</strong><br>
-            <small>${r.date}</small>
+            <small>${r.date} · ${r.svc} · ${r.vtp}</small>
           </div>
           <div>
             ${fmt(r.commission)}
+            <button onclick="editRec('${r.id}')">✏️</button>
             <button onclick="delRec('${r.id}')">✕</button>
           </div>
         </div>
