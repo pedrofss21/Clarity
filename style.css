@@ -3,111 +3,181 @@
 }
 
 :root {
-  --bg: #090911;
-  --text: #eee;
-  --card: rgba(255,255,255,0.05);
-  --input: #141425;
+  --bg: #0b0b0f;
+  --text: #f5f5f7;
+  --sub: #a1a1aa;
+
+  --glass: rgba(255,255,255,0.06);
+  --glass-strong: rgba(255,255,255,0.12);
+
+  --border: rgba(255,255,255,0.08);
+
+  --blue: #4f8ef7;
+  --purple: #8b5cf6;
+  --green: #10b981;
 }
 
 .light {
   --bg: #f5f7fb;
   --text: #0f172a;
-  --card: rgba(255,255,255,0.9);
-  --input: #ffffff;
+  --sub: #6b7280;
+
+  --glass: rgba(255,255,255,0.7);
+  --glass-strong: rgba(255,255,255,0.9);
+
+  --border: rgba(0,0,0,0.06);
 }
 
 body {
   margin: 0;
-  font-family: 'Segoe UI', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", sans-serif;
   background: var(--bg);
   color: var(--text);
-  transition: all .3s;
-  overflow-x: hidden;
+  transition: all .35s ease;
 }
 
+/* Container */
 .container {
-  max-width: 420px;
+  max-width: 430px;
   margin: auto;
-  padding: 16px;
+  padding: 20px;
 }
 
+/* Title */
 .title {
-  font-size: 28px;
+  font-size: 32px;
   font-weight: 800;
-  background: linear-gradient(130deg,#fff,#4f8ef7);
+  margin-bottom: 10px;
+
+  background: linear-gradient(120deg,#fff, var(--blue));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+/* Glass card */
 .card {
-  background: var(--card);
-  border-radius: 18px;
-  padding: 16px;
-  margin-top: 12px;
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,0.08);
+  background: var(--glass);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+
+  border: 1px solid var(--border);
+  border-radius: 24px;
+
+  padding: 18px;
+  margin-top: 14px;
+
+  box-shadow:
+    0 10px 30px rgba(0,0,0,0.25),
+    inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
-.row {
-  display: flex;
-  gap: 10px;
-}
-
+/* Buttons */
 button {
-  flex: 1;
-  padding: 12px;
-  border-radius: 12px;
   border: none;
-  background: #1a1a2a;
-  color: #aaa;
+  border-radius: 16px;
+  padding: 14px;
+  font-weight: 600;
   cursor: pointer;
+
+  background: rgba(255,255,255,0.05);
+  color: var(--sub);
+
+  transition: all .2s ease;
 }
 
 button.active {
-  background: linear-gradient(135deg,#4f8ef7,#8b5cf6);
-  color: white;
+  background: linear-gradient(135deg,var(--blue),var(--purple));
+  color: #fff;
+
+  box-shadow: 0 6px 20px rgba(79,142,247,.4);
 }
 
+button:active {
+  transform: scale(.96);
+}
+
+/* Primary button */
 .primary {
   width: 100%;
-  margin-top: 10px;
-  background: linear-gradient(135deg,#4f8ef7,#8b5cf6);
+  margin-top: 14px;
+
+  background: linear-gradient(135deg,var(--blue),var(--purple));
   color: white;
+
+  box-shadow: 0 10px 30px rgba(79,142,247,.4);
 }
 
+/* Inputs */
 input {
   width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  border-radius: 12px;
-  border: none;
-  background: var(--input);
+  margin-top: 12px;
+  padding: 14px;
+
+  border-radius: 16px;
+  border: 1px solid var(--border);
+
+  background: var(--glass-strong);
   color: var(--text);
+
+  font-size: 15px;
+  outline: none;
 }
 
+input::placeholder {
+  color: var(--sub);
+}
+
+/* Stats */
 .stats {
   display: flex;
   justify-content: space-between;
   margin-top: 12px;
 }
 
-.item {
-  background: var(--input);
-  padding: 12px;
-  border-radius: 12px;
-  margin-top: 8px;
-  display: flex;
-  justify-content: space-between;
+.stats div {
+  background: var(--glass);
+  padding: 14px;
+  border-radius: 16px;
+  width: 48%;
+
+  text-align: center;
+
+  border: 1px solid var(--border);
 }
 
-#toast {
-  position: fixed;
-  bottom: 20px;
-  left: 50%;
-  transform: translateX(-50%);
-  background: #10b981;
-  padding: 12px 20px;
-  border-radius: 30px;
-  display: none;
-  color: #fff;
+/* List items */
+.item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  margin-top: 10px;
+  padding: 14px;
+
+  border-radius: 18px;
+  background: var(--glass);
+  border: 1px solid var(--border);
+
+  backdrop-filter: blur(20px);
+}
+
+.item strong {
+  font-size: 16px;
+}
+
+.item small {
+  color: var(--sub);
+}
+
+/* Floating theme button */
+.theme-btn {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+
+  background: var(--glass);
+  backdrop-filter: blur(20px);
+
+  border-radius: 50px;
+  padding: 8px 14px;
 }
