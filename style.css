@@ -1,5 +1,4 @@
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     /* ── TOKENS ── */
     :root {
@@ -476,4 +475,3 @@
     .toast-ok   { background: var(--money); color: #fff; }
     .toast-warn { background: #1E1E2E; color: #F4F4F8; }
     .dark .toast-warn { background: #F4F4F8; color: #111117; }
-  </style>
