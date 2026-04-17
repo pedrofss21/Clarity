@@ -1,3 +1,15 @@
+const firebaseConfig = {
+  apiKey: "AIzaSyAGbBwk8QsuWyJq_m_sXONWuwwJKy2KToY",
+  authDomain: "detailing-pro-80216.firebaseapp.com",
+  projectId: "detailing-pro-80216",
+  appId: "1:863822440299:web:e18d11335c95bbb4750e2e"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const auth = firebase.auth();
+const db = firebase.firestore();
+
 /* ── DATA ── */
 const COMMISSION = {
   Higienização: { Novo: 7, "Semi-novo": 7 },
