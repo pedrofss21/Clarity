@@ -2,17 +2,26 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+  <!-- 🔥 ESSENCIAL PRA MOBILE (evita bugs de layout no iPhone) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <title>Detailing Pro</title>
+
+  <!-- CSS -->
   <link rel="stylesheet" href="styles.css">
+
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
+
 <body>
   <div id="toast"></div>
   <div id="app"></div>
 
-  <script src="script.js"></script>
+  <!-- 🔥 GARANTE QUE O DOM CARREGOU ANTES DO JS -->
+  <script src="script.js" defer></script>
 </body>
 </html>
