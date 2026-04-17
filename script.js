@@ -10,6 +10,8 @@ firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
 
+const app = document.getElementById("app");
+
 /* ── DATA ── */
 const COMMISSION = {
   Higienização: { Novo: 7, "Semi-novo": 7 },
@@ -185,7 +187,7 @@ function render() {
         `;
       }).join("");
 
-  document.getElementById("app").innerHTML = `
+  app.innerHTML = `
     <div class="container">
 
       <div class="header">
@@ -251,5 +253,7 @@ function render() {
 }
 
 /* ── INIT ── */
-applyTheme();
-render();
+document.addEventListener("DOMContentLoaded", () => {
+  applyTheme();
+  render();
+});
