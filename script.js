@@ -240,4 +240,4 @@ function render() {
 
 /* ── INIT ── */
 applyTheme();
-render();
+render(); 
