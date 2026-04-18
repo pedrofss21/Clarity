@@ -1,259 +1,173 @@
-const firebaseConfig = {
-  apiKey: "AIzaSyAGbBwk8QsuWyJq_m_sXONWuwwJKy2KToY",
-  authDomain: "detailing-pro-80216.firebaseapp.com",
-  projectId: "detailing-pro-80216",
-  appId: "1:863822440299:web:e18d11335c95bbb4750e2e"
-};
+/* ── LOGIN SIMPLES ── */
+function checkAuth(){
+  if(!localStorage.getItem("user")){
+    renderLogin();
+  } else {
+    renderApp();
+  }
+}
 
-firebase.initializeApp(firebaseConfig);
+function login(){
+  const user = document.getElementById("user").value;
+  const pass = document.getElementById("pass").value;
 
-const auth = firebase.auth();
-const db = firebase.firestore();
+  if(user && pass){
+    localStorage.setItem("user", user);
+    location.reload();
+  } else {
+    alert("Preencha os dados");
+  }
+}
 
-const app = document.getElementById("app");
-
-/* ── DATA ── */
-const COMMISSION = {
-  Higienização: { Novo: 7, "Semi-novo": 7 },
-  Polimento:    { Novo: 5, "Semi-novo": 10 },
-};
-
-const MONTHS = [
-  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
-  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro",
-];
+function logout(){
+  localStorage.removeItem("user");
+  location.reload();
+}
 
 /* ── STATE ── */
-const state = {
-  svc: null,
-  vtp: null,
-  recs: JSON.parse(localStorage.getItem("hig_v4")) || [],
-  yr: new Date().getFullYear(),
-  mo: new Date().getMonth(),
-  theme: localStorage.getItem("theme") || "dark",
-};
+let recs = JSON.parse(localStorage.getItem("recs")) || [];
+let editingId = null;
+let dark = true;
 
 /* ── HELPERS ── */
-const fmt = v => v.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
-const mkKey = (y,m) => `${y}-${String(m+1).padStart(2,"0")}`;
-const save = () => localStorage.setItem("hig_v4", JSON.stringify(state.recs));
+const fmt = v => v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
 
-/* ── THEME ── */
-function applyTheme() {
-  document.body.classList.toggle("dark", state.theme === "dark");
+function save(){
+  localStorage.setItem("recs", JSON.stringify(recs));
 }
 
-function toggleTheme() {
-  state.theme = state.theme === "dark" ? "light" : "dark";
-  localStorage.setItem("theme", state.theme);
-  applyTheme();
-  render(false);
-}
-
-/* ── TOAST ── */
-function toast(msg, ok = false) {
+function toast(msg){
   const t = document.getElementById("toast");
-  t.className = ok ? "toast-ok" : "toast-warn";
   t.innerText = msg;
-  t.style.display = "block";
-
-  clearTimeout(toast._t);
-  toast._t = setTimeout(() => t.style.display = "none", 2000);
+  t.style.display="block";
+  setTimeout(()=>t.style.display="none",2000);
 }
 
-/* ── NAV ── */
-function prevMonth() {
-  if (state.mo === 0) { state.mo = 11; state.yr--; }
-  else state.mo--;
-  render(false);
-}
+/* ── CRUD ── */
+function addOrEdit(){
+  const plate = document.getElementById("plate").value;
+  const date  = document.getElementById("date").value;
+  const svc   = document.getElementById("svc").value;
+  const vtp   = document.getElementById("vtp").value;
 
-function nextMonth() {
-  if (state.mo === 11) { state.mo = 0; state.yr++; }
-  else state.mo++;
-  render(false);
-}
+  const commission =
+    svc==="Higienização"
+      ? 7
+      : (vtp==="Novo" ? 5 : 10);
 
-/* ── ADD ── */
-function addRec() {
-  const plateInput = document.getElementById("plateInput");
-  const dateInput  = document.getElementById("dateInput");
+  if(!plate) return toast("Digite a placa");
 
-  const plate = plateInput.value.trim().toUpperCase();
-  const dateValue = dateInput.value;
-
-  if (!state.svc) return toast("Selecione o serviço");
-  if (!state.vtp) return toast("Selecione o tipo");
-  if (!plate)     return toast("Digite a placa ou chassi");
-
-  const date = dateValue
-    ? new Date(dateValue + "T12:00:00").toLocaleDateString("pt-BR")
-    : new Date().toLocaleDateString("pt-BR");
-
-  state.recs.unshift({
-    id: Date.now(),
-    plate,
-    svc: state.svc,
-    vtp: state.vtp,
-    commission: COMMISSION[state.svc][state.vtp],
-    date,
-    mk: mkKey(state.yr, state.mo),
-  });
+  if(editingId){
+    const r = recs.find(r=>r.id===editingId);
+    r.plate=plate;
+    r.date=date;
+    r.svc=svc;
+    r.vtp=vtp;
+    r.commission=commission;
+    editingId=null;
+    toast("Editado!");
+  } else {
+    recs.unshift({
+      id:Date.now(),
+      plate, date, svc, vtp, commission
+    });
+    toast("Adicionado!");
+  }
 
   save();
-  toast("Serviço adicionado", true);
-
-  plateInput.value = "";
-  dateInput.value  = "";
-
-  render(false);
+  renderApp();
 }
 
-/* ── DELETE ── */
-function delRec(id) {
-  state.recs = state.recs.filter(r => r.id != id);
+function editRec(id){
+  const r = recs.find(r=>r.id===id);
+  editingId = id;
+
+  document.getElementById("plate").value = r.plate;
+  document.getElementById("date").value  = r.date;
+  document.getElementById("svc").value   = r.svc;
+  document.getElementById("vtp").value   = r.vtp;
+}
+
+function delRec(id){
+  recs = recs.filter(r=>r.id!==id);
   save();
-  render(false);
+  renderApp();
 }
 
 /* ── REPORT ── */
-function generateReport() {
-  const mk   = mkKey(state.yr, state.mo);
-  const list = state.recs.filter(r => r.mk === mk);
-  const total = list.reduce((s, r) => s + r.commission, 0);
+function generateReport(){
+  let total=0;
 
-  const header = `RELATÓRIO — ${MONTHS[state.mo].toUpperCase()} ${state.yr}`;
-  const sep    = "─".repeat(50);
+  const rows = recs.map(r=>{
+    total+=r.commission;
+    return `${r.date} | ${r.plate} | ${r.svc} | ${r.vtp} | ${fmt(r.commission)}`
+  }).join("\n");
 
-  const rows = list.length
-    ? list.map(r =>
-        `${r.date}  |  ${r.plate}  |  ${r.svc}  |  ${r.vtp}  |  ${fmt(r.commission)}`
-      ).join("\n")
-    : "Nenhum registro.";
-
-  const footer = `\n${sep}\nTotal: ${list.length} serviços | ${fmt(total)}`;
-
-  const w = window.open("", "_blank");
-  w.document.write(`<pre style="font-family:monospace;padding:20px">${header}\n${sep}\n${rows}${footer}</pre>`);
+  const w = window.open("");
+  w.document.write(`<pre>${rows}\n\nTOTAL: ${fmt(total)}</pre>`);
   w.print();
 }
 
-/* ── RENDER ── */
-function render() {
+/* ── UI ── */
+function renderLogin(){
+  document.getElementById("app").innerHTML = `
+    <div class="container">
+      <h2>Login</h2>
+      <input id="user" placeholder="Usuário">
+      <input id="pass" type="password" placeholder="Senha">
+      <button class="btn-main" onclick="login()">Entrar</button>
+    </div>
+  `;
+}
 
-  const mk = mkKey(state.yr, state.mo);
-  const list = state.recs.filter(r => r.mk === mk);
-  const total = list.reduce((s, r) => s + r.commission, 0);
+function renderApp(){
 
-  const commission =
-    state.svc && state.vtp
-      ? COMMISSION[state.svc][state.vtp]
-      : null;
+  document.body.className = dark ? "" : "light";
 
-  const svcBtns = ["Higienização","Polimento"].map(s =>
-    `<button class="tog-btn${state.svc===s?" active":""}" onclick="state.svc='${s}';render()">${s}</button>`
-  ).join("");
-
-  const vtpBtns = ["Novo","Semi-novo"].map(t =>
-    `<button class="tog-btn${state.vtp===t?" active":""}" onclick="state.vtp='${t}';render()">${t}</button>`
-  ).join("");
-
-  const recordsHtml = list.length === 0
-    ? `<div class="empty">
-        <div class="empty-icon">🚗</div>
-        <div class="empty-title">Sem serviços</div>
-        <div class="empty-sub">${MONTHS[state.mo]} ainda não tem registros</div>
-      </div>`
-    : list.map(r => {
-        const tagSvc = r.svc === "Higienização" ? "tag-hig" : "tag-pol";
-        const tagVtp = r.vtp === "Novo" ? "tag-new" : "tag-semi";
-
-        return `
-          <div class="rec-item">
-            <div>
-              <div class="rec-plate">${r.plate}</div>
-              <div class="rec-meta">
-                <span class="rec-date">${r.date}</span>
-                <span class="tag ${tagSvc}">${r.svc}</span>
-                <span class="tag ${tagVtp}">${r.vtp}</span>
-              </div>
-            </div>
-
-            <div class="rec-right">
-              <div class="rec-val">${fmt(r.commission)}</div>
-              <button class="del-btn" onclick="delRec('${r.id}')">✕</button>
-            </div>
-          </div>
-        `;
-      }).join("");
-
-  app.innerHTML = `
+  document.getElementById("app").innerHTML = `
     <div class="container">
 
-      <div class="header">
-        <div>
-          <div class="app-label">Detailing Pro</div>
-          <div class="title">Comissões</div>
-        </div>
-        <button class="theme-btn" onclick="toggleTheme()">
-          ${state.theme === "dark" ? "☀️" : "🌙"}
+      <button onclick="logout()">Sair</button>
+      <button onclick="toggleTheme()">Tema</button>
+
+      <div class="card">
+        <input id="date" type="date">
+        <input id="plate" placeholder="Placa">
+
+        <select id="svc">
+          <option>Higienização</option>
+          <option>Polimento</option>
+        </select>
+
+        <select id="vtp">
+          <option>Novo</option>
+          <option>Semi-novo</option>
+        </select>
+
+        <button class="btn-main" onclick="addOrEdit()">
+          ${editingId ? "Salvar edição" : "Adicionar"}
         </button>
       </div>
 
-      <div class="card">
-        <div class="toggle-group">${svcBtns}</div>
-        <div class="toggle-group">${vtpBtns}</div>
+      <button class="btn-report" onclick="generateReport()">Gerar relatório</button>
 
-        <div class="comm-preview${commission === null ? " hidden" : ""}">
-          <span class="comm-label">Sua comissão</span>
-          <span class="comm-value">${commission !== null ? fmt(commission) : "—"}</span>
+      ${recs.map(r=>`
+        <div class="card">
+          ${r.plate} - ${r.svc} - ${fmt(r.commission)}
+          <button class="btn-edit" onclick="editRec('${r.id}')">Editar</button>
+          <button class="btn-del" onclick="delRec('${r.id}')">Excluir</button>
         </div>
-
-        <div class="inp-wrap">
-          <input type="date" id="dateInput">
-        </div>
-
-        <div class="inp-wrap">
-          <input type="text" id="plateInput" placeholder="Placa ou chassi">
-        </div>
-
-        <button class="btn-primary" onclick="addRec()">+ Adicionar</button>
-      </div>
-
-      <div class="card">
-        <div class="month-nav">
-          <button class="nav-btn" onclick="prevMonth()">‹</button>
-          <div class="month-label">${MONTHS[state.mo]} ${state.yr}</div>
-          <button class="nav-btn" onclick="nextMonth()">›</button>
-        </div>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-icon">🚘</div>
-          <div class="stat-num">${list.length}</div>
-          <div class="stat-lbl">Serviços</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-icon">💰</div>
-          <div class="stat-num money">${fmt(total)}</div>
-          <div class="stat-lbl">Comissão</div>
-        </div>
-      </div>
-
-      <button class="btn-report" onclick="generateReport()">📄 Gerar Relatório</button>
-
-      ${recordsHtml}
+      `).join("")}
 
     </div>
   `;
+}
 
-  applyTheme();
+/* ── THEME ── */
+function toggleTheme(){
+  dark=!dark;
+  renderApp();
 }
 
 /* ── INIT ── */
-document.addEventListener("DOMContentLoaded", () => {
-  applyTheme();
-  render();
-});
+checkAuth();
