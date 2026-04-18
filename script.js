@@ -1,173 +1,243 @@
-/* ── LOGIN SIMPLES ── */
-function checkAuth(){
-  if(!localStorage.getItem("user")){
-    renderLogin();
-  } else {
-    renderApp();
-  }
-}
+/* ── DATA ── */
+const COMMISSION = {
+  Higienização: { Novo: 7, "Semi-novo": 7 },
+  Polimento:    { Novo: 5, "Semi-novo": 10 },
+};
 
-function login(){
-  const user = document.getElementById("user").value;
-  const pass = document.getElementById("pass").value;
-
-  if(user && pass){
-    localStorage.setItem("user", user);
-    location.reload();
-  } else {
-    alert("Preencha os dados");
-  }
-}
-
-function logout(){
-  localStorage.removeItem("user");
-  location.reload();
-}
+const MONTHS = [
+  "Janeiro","Fevereiro","Março","Abril","Maio","Junho",
+  "Julho","Agosto","Setembro","Outubro","Novembro","Dezembro",
+];
 
 /* ── STATE ── */
-let recs = JSON.parse(localStorage.getItem("recs")) || [];
-let editingId = null;
-let dark = true;
+const state = {
+  svc: null,
+  vtp: null,
+  recs: JSON.parse(localStorage.getItem("hig_v4")) || [],
+  yr: new Date().getFullYear(),
+  mo: new Date().getMonth(),
+  theme: localStorage.getItem("theme") || "dark",
+  editingId: null
+};
 
 /* ── HELPERS ── */
-const fmt = v => v.toLocaleString("pt-BR",{style:"currency",currency:"BRL"});
+const fmt = v => v.toLocaleString("pt-BR", { style:"currency", currency:"BRL" });
+const mkKey = (y,m) => `${y}-${String(m+1).padStart(2,"0")}`;
+const save = () => localStorage.setItem("hig_v4", JSON.stringify(state.recs));
 
-function save(){
-  localStorage.setItem("recs", JSON.stringify(recs));
+/* ── THEME ── */
+function applyTheme() {
+  document.body.classList.toggle("dark", state.theme === "dark");
 }
 
-function toast(msg){
+function toggleTheme() {
+  state.theme = state.theme === "dark" ? "light" : "dark";
+  localStorage.setItem("theme", state.theme);
+  applyTheme();
+  render();
+}
+
+/* ── TOAST ── */
+function toast(msg) {
   const t = document.getElementById("toast");
   t.innerText = msg;
-  t.style.display="block";
-  setTimeout(()=>t.style.display="none",2000);
+  t.style.display = "block";
+
+  setTimeout(() => t.style.opacity = "1", 10);
+
+  setTimeout(() => {
+    t.style.opacity = "0";
+    setTimeout(() => t.style.display = "none", 300);
+  }, 2000);
 }
 
-/* ── CRUD ── */
-function addOrEdit(){
-  const plate = document.getElementById("plate").value;
-  const date  = document.getElementById("date").value;
-  const svc   = document.getElementById("svc").value;
-  const vtp   = document.getElementById("vtp").value;
+/* ── NAV ── */
+function prevMonth() {
+  if (state.mo === 0) { state.mo = 11; state.yr--; }
+  else state.mo--;
+  render();
+}
 
-  const commission =
-    svc==="Higienização"
-      ? 7
-      : (vtp==="Novo" ? 5 : 10);
+function nextMonth() {
+  if (state.mo === 11) { state.mo = 0; state.yr++; }
+  else state.mo++;
+  render();
+}
 
-  if(!plate) return toast("Digite a placa");
+/* ── ADD / UPDATE ── */
+function addRec() {
+  const plate = document.getElementById("plateInput").value.trim().toUpperCase();
+  const dateValue = document.getElementById("dateInput").value;
 
-  if(editingId){
-    const r = recs.find(r=>r.id===editingId);
-    r.plate=plate;
-    r.date=date;
-    r.svc=svc;
-    r.vtp=vtp;
-    r.commission=commission;
-    editingId=null;
-    toast("Editado!");
+  if (!state.svc) return toast("Selecione o serviço");
+  if (!state.vtp) return toast("Selecione o tipo");
+  if (!plate) return toast("Digite a placa");
+
+  const date = dateValue
+    ? new Date(dateValue + "T12:00:00").toLocaleDateString("pt-BR")
+    : new Date().toLocaleDateString("pt-BR");
+
+  if (state.editingId) {
+    const rec = state.recs.find(r => r.id === state.editingId);
+
+    rec.plate = plate;
+    rec.svc = state.svc;
+    rec.vtp = state.vtp;
+    rec.commission = COMMISSION[state.svc][state.vtp];
+    rec.date = date;
+
+    state.editingId = null;
+
+    toast("Editado com sucesso");
   } else {
-    recs.unshift({
-      id:Date.now(),
-      plate, date, svc, vtp, commission
+    state.recs.unshift({
+      id: Date.now(),
+      plate,
+      svc: state.svc,
+      vtp: state.vtp,
+      commission: COMMISSION[state.svc][state.vtp],
+      date,
+      mk: mkKey(state.yr, state.mo),
     });
-    toast("Adicionado!");
+
+    toast("Adicionado com sucesso");
   }
 
   save();
-  renderApp();
+
+  document.getElementById("plateInput").value = "";
+  document.getElementById("dateInput").value = "";
+
+  render();
 }
 
-function editRec(id){
-  const r = recs.find(r=>r.id===id);
-  editingId = id;
+/* ── EDIT ── */
+function editRec(id) {
+  const rec = state.recs.find(r => r.id === id);
 
-  document.getElementById("plate").value = r.plate;
-  document.getElementById("date").value  = r.date;
-  document.getElementById("svc").value   = r.svc;
-  document.getElementById("vtp").value   = r.vtp;
+  state.svc = rec.svc;
+  state.vtp = rec.vtp;
+  state.editingId = id;
+
+  document.getElementById("plateInput").value = rec.plate;
+
+  render();
+
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth"
+  });
 }
 
-function delRec(id){
-  recs = recs.filter(r=>r.id!==id);
+/* ── DELETE ── */
+function delRec(id) {
+  state.recs = state.recs.filter(r => r.id !== id);
   save();
-  renderApp();
+  render();
 }
 
 /* ── REPORT ── */
-function generateReport(){
-  let total=0;
+function generateReport() {
+  const mk = mkKey(state.yr, state.mo);
+  const list = state.recs.filter(r => r.mk === mk);
+  const total = list.reduce((s, r) => s + r.commission, 0);
 
-  const rows = recs.map(r=>{
-    total+=r.commission;
-    return `${r.date} | ${r.plate} | ${r.svc} | ${r.vtp} | ${fmt(r.commission)}`
-  }).join("\n");
+  const content = `
+RELATÓRIO - ${MONTHS[state.mo]} ${state.yr}
 
-  const w = window.open("");
-  w.document.write(`<pre>${rows}\n\nTOTAL: ${fmt(total)}</pre>`);
+${list.map(r =>
+`${r.date} - ${r.plate} - ${r.svc} - ${r.vtp} - ${fmt(r.commission)}`
+).join("\n")}
+
+Total: ${fmt(total)}
+`;
+
+  const w = window.open("", "_blank");
+  w.document.write(`<pre>${content}</pre>`);
   w.print();
 }
 
-/* ── UI ── */
-function renderLogin(){
+/* ── RENDER ── */
+function render() {
+
+  const mk = mkKey(state.yr, state.mo);
+  const list = state.recs.filter(r => r.mk === mk);
+  const total = list.reduce((s, r) => s + r.commission, 0);
+
+  const commission =
+    state.svc && state.vtp
+      ? COMMISSION[state.svc][state.vtp]
+      : null;
+
+  const recordsHtml = list.length === 0
+    ? `<div class="empty">Sem registros</div>`
+    : list.map(r => `
+      <div class="rec-item">
+        <div>
+          <div class="rec-plate">${r.plate}</div>
+          <div class="rec-meta">
+            ${r.date} • ${r.svc} • ${r.vtp}
+          </div>
+        </div>
+
+        <div class="rec-right">
+          <div class="rec-val">${fmt(r.commission)}</div>
+
+          <button onclick="editRec(${r.id})">✏️</button>
+          <button onclick="delRec(${r.id})">✕</button>
+        </div>
+      </div>
+    `).join("");
+
   document.getElementById("app").innerHTML = `
     <div class="container">
-      <h2>Login</h2>
-      <input id="user" placeholder="Usuário">
-      <input id="pass" type="password" placeholder="Senha">
-      <button class="btn-main" onclick="login()">Entrar</button>
-    </div>
-  `;
-}
 
-function renderApp(){
+      <div class="header">
+        <div>
+          <div class="app-label">Detailing Pro</div>
+          <div class="title">Comissões</div>
+        </div>
 
-  document.body.className = dark ? "" : "light";
-
-  document.getElementById("app").innerHTML = `
-    <div class="container">
-
-      <button onclick="logout()">Sair</button>
-      <button onclick="toggleTheme()">Tema</button>
-
-      <div class="card">
-        <input id="date" type="date">
-        <input id="plate" placeholder="Placa">
-
-        <select id="svc">
-          <option>Higienização</option>
-          <option>Polimento</option>
-        </select>
-
-        <select id="vtp">
-          <option>Novo</option>
-          <option>Semi-novo</option>
-        </select>
-
-        <button class="btn-main" onclick="addOrEdit()">
-          ${editingId ? "Salvar edição" : "Adicionar"}
+        <button onclick="toggleTheme()">
+          ${state.theme === "dark" ? "☀️" : "🌙"}
         </button>
       </div>
 
-      <button class="btn-report" onclick="generateReport()">Gerar relatório</button>
+      <div class="card">
 
-      ${recs.map(r=>`
-        <div class="card">
-          ${r.plate} - ${r.svc} - ${fmt(r.commission)}
-          <button class="btn-edit" onclick="editRec('${r.id}')">Editar</button>
-          <button class="btn-del" onclick="delRec('${r.id}')">Excluir</button>
-        </div>
-      `).join("")}
+        <select onchange="state.svc=this.value;render()">
+          <option value="">Serviço</option>
+          <option ${state.svc==="Higienização"?"selected":""}>Higienização</option>
+          <option ${state.svc==="Polimento"?"selected":""}>Polimento</option>
+        </select>
+
+        <select onchange="state.vtp=this.value;render()">
+          <option value="">Tipo</option>
+          <option ${state.vtp==="Novo"?"selected":""}>Novo</option>
+          <option ${state.vtp==="Semi-novo"?"selected":""}>Semi-novo</option>
+        </select>
+
+        <input type="date" id="dateInput">
+        <input type="text" id="plateInput" placeholder="Placa">
+
+        <button onclick="addRec()">
+          ${state.editingId ? "Salvar edição" : "Adicionar"}
+        </button>
+
+      </div>
+
+      <button onclick="generateReport()">Gerar relatório</button>
+
+      <h3>Total: ${fmt(total)}</h3>
+
+      ${recordsHtml}
 
     </div>
   `;
-}
 
-/* ── THEME ── */
-function toggleTheme(){
-  dark=!dark;
-  renderApp();
+  applyTheme();
 }
 
 /* ── INIT ── */
-checkAuth();
+applyTheme();
+render();
