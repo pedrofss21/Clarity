@@ -20,6 +20,15 @@
     </header>
 
     <main class="content">
+      <!-- pesquisa -->
+      <section class="section">
+    <input
+        type="text"
+        id="searchInput"
+        class="input"
+        placeholder="🔍 Pesquisar placa, modelo ou serviço..."
+    >
+</section>
 
       <!-- Serviço -->
       <section class="section">
@@ -55,6 +64,16 @@
 
       <!-- Lista de veículos -->
       <section id="carList" class="car-list"></section>
+
+<div class="car-actions">
+    <button class="edit-btn" onclick="editarVeiculo(${car.id})">
+        ✏️ Editar
+    </button>
+
+    <button class="delete-btn" onclick="excluirVeiculo(${car.id})">
+        🗑 Excluir
+    </button>
+</div>
 
       <!-- Gerar PDF -->
       <button class="secondary-btn">Gerar PDF</button>
