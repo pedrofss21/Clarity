@@ -80,37 +80,76 @@ const total = lista.reduce((soma, carro) => soma + carro.valor, 0);
 totalCommission.textContent = formatBRL(total);
 }
 function renderCarList(lista = cars) {
-carList.innerHTML = "";
-if (lista.length === 0) {
-carList.innerHTML = `
-<div class="car-item">
-<div class="info-sub">Nenhum veículo encontrado.</div>
-</div>
-`;
-updateSummary(lista);
-return;
-}
-lista.forEach((car) => {
-const item = document.createElement("div");
-item.className = "car-item";
-const data = new Date(car.data + "T00:00:00").toLocaleDateString("pt-BR");
-item.innerHTML = `
-<div>
-<div class="info-title"> ${car.placa}${car.modelo ? " • " + car.modelo : ""
-<div class="info-sub">${car.servico} • ${car.tipo}</div>
-<div class="info-sub"> ${data}</div>
-</div>
-<div style="text-align:right;">
-<div class="value">${formatBRL(car.valor)}</div>
-<div class="car-actions">
-<button class="edit-btn" onclick="editarVeiculo(${car.id})"> </button>
-<button class="delete-btn" onclick="excluirVeiculo(${car.id})"> </button
-</div>
-</div>
-`;
-carList.appendChild(item);
-});
-updateSummary(lista);
+
+    carList.innerHTML = "";
+
+    if (lista.length === 0) {
+
+        carList.innerHTML = `
+            <div class="car-item">
+                <div class="info-sub">
+                    Nenhum veículo encontrado.
+                </div>
+            </div>
+        `;
+
+        updateSummary(lista);
+        return;
+    }
+
+    lista.forEach((car) => {
+
+        const item = document.createElement("div");
+
+        item.className = "car-item";
+
+        const data = new Date(car.data + "T00:00:00")
+            .toLocaleDateString("pt-BR");
+
+        item.innerHTML = `
+            <div>
+
+                <div class="info-title">
+                    🚗 ${car.placa}${car.modelo ? " • " + car.modelo : ""}
+                </div>
+
+                <div class="info-sub">
+                    ${car.servico} • ${car.tipo}
+                </div>
+
+                <div class="info-sub">
+                    📅 ${data}
+                </div>
+
+            </div>
+
+            <div style="text-align:right;">
+
+                <div class="value">
+                    ${formatBRL(car.valor)}
+                </div>
+
+                <div class="car-actions">
+
+                    <button class="edit-btn" onclick="editarVeiculo(${car.id})">
+                        ✏️
+                    </button>
+
+                    <button class="delete-btn" onclick="excluirVeiculo(${car.id})">
+                        🗑
+                    </button>
+
+                </div>
+
+            </div>
+        `;
+
+        carList.appendChild(item);
+
+    });
+
+    updateSummary(lista);
+
 }
 function editarVeiculo(id) {
 const carro = buscarCarro(id);
@@ -270,7 +309,7 @@ themeToggle.addEventListener("click", () => {
 const isDark = document.body.classList.contains("dark");
 document.body.classList.toggle("dark", !isDark);
 document.body.classList.toggle("light", isDark);
-themeToggle.textContent = isDark ? " " : " ";
+themeToggle.textContent = isDark ? "☀️" : "🌙";
 });
 // ===========================================
 // INÍCIO
