@@ -48,6 +48,47 @@ body {
   padding: 28px 20px 16px;
 }
 
+.car-actions{
+    display:flex;
+    gap:8px;
+    margin-top:10px;
+}
+
+.edit-btn{
+
+    flex:1;
+
+    background:#2d8cff;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px;
+
+    cursor:pointer;
+
+}
+
+.delete-btn{
+
+    flex:1;
+
+    background:#d9534f;
+
+    color:white;
+
+    border:none;
+
+    border-radius:8px;
+
+    padding:8px;
+
+    cursor:pointer;
+
+}
 .eyebrow {
   font-size: 12px;
   letter-spacing: 1.5px;
