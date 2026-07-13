@@ -3,7 +3,7 @@
 // ===========================================
 
 let supabaseClient = null;
-...
+
 if (window.supabase) {
   supabaseClient = window.supabase.createClient(
     "https://kknauyvxqbdtbsbrcsqt.supabase.co",
