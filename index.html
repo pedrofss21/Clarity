@@ -7,7 +7,18 @@
 <link rel="stylesheet" href="style.css" />
 </head>
 <body class="dark">
+  
+<!-- CAPTURADOR DE ERROS - cole isso logo depois de <body class="dark"> -->
+<div id="errorBox" style="display:none; position:fixed; top:0; left:0; right:0; z-index:9999; background:#b00020; color:#fff; padding:12px; font:12px monospace; white-space:pre-wrap; max-height:40vh; overflow:auto;"></div>
+<script>
+  window.addEventListener('error', function (e) {
+    var box = document.getElementById('errorBox');
+    box.style.display = 'block';
+    box.textContent = 'ERRO: ' + e.message + '\nArquivo: ' + e.filename + '\nLinha: ' + e.lineno + ':' + e.colno;
+  });
+</script>
 
+<!-- FIM DO CAPTURADOR -->
   <div class="page">
 
     <!-- Header -->
