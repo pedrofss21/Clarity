@@ -2,12 +2,16 @@
 // SISTEMA DE HIGIENIZAÇÕES - VERSÃO 2.0
 // ===========================================
 
-console.log("window.supabase =", window.supabase);
+let supabase = null;
 
-const supabase = window.supabase.createClient(
-  "https://kknauyvxqbdtbsbrcsqt.supabase.co",
-"sb_publishable_gFfjyvLrrGKxZJNi3sOyGg_taig6Pl5"
-);
+console.log("window.supabase:", window.supabase);
+
+if (window.supabase) {
+  supabase = window.supabase.createClient(
+    "https://kknauyvxqbdtbsbrcsqt.supabase.co",
+    “sb_publishable_gFfjyvLrrGKxZJNi3sOyGg_taig6Pl5”
+  );
+}
 
 // ---------- Tabela de preços ----------
 const PRECOS = {
