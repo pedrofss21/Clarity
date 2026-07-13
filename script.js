@@ -1,6 +1,12 @@
 // ===========================================
 // SISTEMA DE HIGIENIZAÇÕES - VERSÃO 2.0
 // ===========================================
+
+const supabase = window.supabase.createClient(
+  "https://kknauyvxqbdtbsbrcsqt.supabase.co",
+"sb_publishable_gFfjyvLrrGKxZJNi3sOyGg_taig6Pl5"
+);
+
 // ---------- Tabela de preços ----------
 const PRECOS = {
 "Higienização": {
