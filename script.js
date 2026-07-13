@@ -2,6 +2,8 @@
 // SISTEMA DE HIGIENIZAÇÕES - VERSÃO 2.0
 // ===========================================
 
+console.log("window.supabase =", window.supabase);
+
 const supabase = window.supabase.createClient(
   "https://kknauyvxqbdtbsbrcsqt.supabase.co",
 "sb_publishable_gFfjyvLrrGKxZJNi3sOyGg_taig6Pl5"
